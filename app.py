@@ -12,7 +12,7 @@ def load_kobart_model():
     return model, tokenizer
 
 # 생성적 요약 함수
-def summarize_content(content, model, tokenizer, max_length=32, min_length=16):
+def summarize_content(content, model, tokenizer, max_length=64, min_length=16):
     inputs = tokenizer.encode("summarize: " + content, return_tensors="pt", max_length=1024, truncation=True)
     summary_ids = model.generate(
         inputs,
