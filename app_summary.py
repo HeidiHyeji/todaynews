@@ -2,7 +2,9 @@ import requests
 import streamlit as st
 import json
 from datetime import datetime, timedelta
-from transformers import BartForConditionalGeneration, PreTrainedTokenizerFast
+from transformers import BartForConditionalGeneration, PreTrainedTokenizerFast, pipeline
+from sklearn.feature_extraction.text import TfidfVectorizer
+import numpy as np
 
 # KoBART 모델과 토크나이저 로드 함수
 @st.cache_resource  # Streamlit에서 모델을 캐싱하여 로드 속도 개선
@@ -11,8 +13,24 @@ def load_kobart_model():
     tokenizer = PreTrainedTokenizerFast.from_pretrained('gogamza/kobart-summarization')
     return model, tokenizer
 
+# 추출적 요약 함수
+def extractive_summary(content, n=3):
+    """
+    추출적 요약: TF-IDF 기반으로 중요 문장 n개 추출
+    """
+    sentences = content.split('. ')
+    tfidf_vectorizer = TfidfVectorizer()
+    tfidf_matrix = tfidf_vectorizer.fit_transform(sentences)
+    sentence_scores = tfidf_matrix.sum(axis=1).flatten().tolist()[0]
+    ranked_sentences = np.argsort(sentence_scores)[::-1][:n]  # 상위 n개 문장 선택
+    extracted_summary = '. '.join([sentences[i] for i in ranked_sentences])
+    return extracted_summary
+
 # 생성적 요약 함수
-def summarize_content(content, model, tokenizer, max_length=64, min_length=16):
+def generative_summary(content, model, tokenizer, max_length=64, min_length=16):
+    """
+    KoBART 생성적 요약
+    """
     inputs = tokenizer.encode("summarize: " + content, return_tensors="pt", max_length=1024, truncation=True)
     summary_ids = model.generate(
         inputs,
@@ -24,6 +42,15 @@ def summarize_content(content, model, tokenizer, max_length=64, min_length=16):
     )
     summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
     return summary
+
+# 하이브리드 요약 함수
+def hybrid_summary(content, model, tokenizer, extract_n=3):
+    """
+    추출적 요약 + 생성적 요약을 결합
+    """
+    extracted = extractive_summary(content, n=extract_n)
+    generated = generative_summary(extracted, model, tokenizer)
+    return generated
 
 # 오늘 날짜와 내일 날짜 계산
 today = datetime.today()
@@ -111,12 +138,12 @@ if response.status_code == 200:
             provider_link_page = document.get('provider_link_page', 'No Link')
             published_at = document.get('published_at', 'No Date')
 
-            # 날짜 포맷 변경: ISO 8601 형식 (2024-12-17T00:00:00.000+09:00)에서 사람이 읽을 수 있는 형식으로 변환
-            published_at_date = datetime.fromisoformat(published_at.replace("Z", "+00:00"))  # Z를 +00:00으로 변환하여 처리
+            # 날짜 포맷 변경: ISO 8601 형식에서 사람이 읽을 수 있는 형식으로 변환
+            published_at_date = datetime.fromisoformat(published_at.replace("Z", "+00:00"))
             formatted_date = published_at_date.strftime('%Y-%m-%d %H:%M:%S')
 
-            # 뉴스 내용을 요약
-            summarized_content = summarize_content(content, model, tokenizer)
+            # 하이브리드 요약 실행
+            summarized_content = hybrid_summary(content, model, tokenizer)
 
             # 제목을 클릭하면 링크로 이동 (제목은 굵은 글씨로 표시)
             with st.expander(f"**{title}**"):
