@@ -1,10 +1,13 @@
 import requests
 import streamlit as st
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
-# 오늘 날짜와 내일 날짜 계산
-today = datetime.today()
+# 대한민국 표준시(KST) 타임존 설정
+KST = timezone(timedelta(hours=9))
+
+# 오늘 날짜와 내일 날짜 계산 (KST 기준)
+today = datetime.now(KST)
 tomorrow = today + timedelta(days=1)
 
 # 날짜를 'YYYY-MM-DD' 형식으로 변환
