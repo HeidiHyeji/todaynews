@@ -46,7 +46,7 @@ params = {
 headers = {'Content-type': 'application/json'}
 
 # Streamlit에서 사용자가 입력한 키워드 받아오기
-st.markdown(f"<h1 style='color: rgb(237, 27, 36);'>📰 오늘의 롯데 <span style='font-size: 14px; color: black;'>- {from_date}</span></h1>", unsafe_allow_html=True)
+st.markdown(f"<h1 style='color: rgb(237, 27, 36); text-align: center;'>📰 오늘의 롯데 <span style='font-size: 14px; color: black;'>- {from_date}</span></h1>", unsafe_allow_html=True)
 
 # 기본 키워드를 입력하는 필드 (초기 query문에 포함)
 default_keywords = ["롯데이노베이트", "이노베이트", "롯데 AND AI"]
