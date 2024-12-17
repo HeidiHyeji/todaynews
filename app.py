@@ -2,28 +2,6 @@ import requests
 import streamlit as st
 import json
 from datetime import datetime, timedelta
-from transformers import BartForConditionalGeneration, PreTrainedTokenizerFast
-
-# KoBART 모델과 토크나이저 로드 함수
-@st.cache_resource  # Streamlit에서 모델을 캐싱하여 로드 속도 개선
-def load_kobart_model():
-    model = BartForConditionalGeneration.from_pretrained('gogamza/kobart-summarization')
-    tokenizer = PreTrainedTokenizerFast.from_pretrained('gogamza/kobart-summarization')
-    return model, tokenizer
-
-# 생성적 요약 함수
-def summarize_content(content, model, tokenizer, max_length=64, min_length=16):
-    inputs = tokenizer.encode("summarize: " + content, return_tensors="pt", max_length=1024, truncation=True)
-    summary_ids = model.generate(
-        inputs,
-        max_length=max_length,
-        min_length=min_length,
-        length_penalty=2.0,
-        num_beams=4,
-        early_stopping=True
-    )
-    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
-    return summary
 
 # 오늘 날짜와 내일 날짜 계산
 today = datetime.today()
@@ -84,9 +62,6 @@ else:
 # API 요청 매개변수에 query 반영
 params["argument"]["query"] = query
 
-# KoBART 모델 로드
-model, tokenizer = load_kobart_model()
-
 # API 요청을 보내고 결과를 받음
 response = requests.post("https://www.newstore.or.kr/api-newstore/v1/search/newsAllList.json", json=params, headers=headers)
 
@@ -115,16 +90,11 @@ if response.status_code == 200:
             published_at_date = datetime.fromisoformat(published_at.replace("Z", "+00:00"))  # Z를 +00:00으로 변환하여 처리
             formatted_date = published_at_date.strftime('%Y-%m-%d %H:%M:%S')
 
-            # 뉴스 내용을 요약
-            summarized_content = summarize_content(content, model, tokenizer)
-
             # 제목을 클릭하면 링크로 이동 (제목은 굵은 글씨로 표시)
             with st.expander(f"**{title}**"):
-                # 요약된 뉴스 내용 표시
-                st.write(f"**요약 내용:** {summarized_content}")
-
-                # 전체 뉴스 내용 표시
-                st.write(f"**전체 뉴스:** {content}")
+                
+                # 뉴스 내용 표시
+                st.write(content)
                 
                 # provider와 링크를 한 줄에 표시
                 st.markdown(f'<div style="display: flex; justify-content: space-between; align-items: center;">'
