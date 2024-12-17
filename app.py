@@ -46,7 +46,7 @@ params = {
 headers = {'Content-type': 'application/json'}
 
 # Streamlit에서 사용자가 입력한 키워드 받아오기
-st.markdown("<h1 style='color: rgb(237, 27, 36);'>오늘의 롯데</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='color: rgb(237, 27, 36);'>📰 오늘의 롯데</h1>({from_date})", unsafe_allow_html=True)
 
 # 기본 키워드를 입력하는 필드 (초기 query문에 포함)
 default_keywords = ["롯데이노베이트", "이노베이트", "롯데 AND AI"]
@@ -77,7 +77,7 @@ if response.status_code == 200:
     
     # 검색된 뉴스 리스트 출력
     if documents:
-        st.write(f"📰총 {len(documents)}건의 오늘의 롯데 소식을 알려드립니다! ")
+        st.write(f"📢 총 {len(documents)}건의 오늘의 롯데 소식을 알려드립니다! ")
         
         for document in documents:
             title = document.get('title', 'No Title')
