@@ -13,3 +13,7 @@ https://todayslotte.streamlit.app/
 #### 데이터 수집
 https://www.newstore.or.kr/store/prodct/license/test-bed.do
 뉴스토어 API를 이용하여 뉴스 데이터 수집
+
+
+
+<img width="1010" alt="image" src="https://github.com/user-attachments/assets/9f43a330-0f51-4eb6-aede-f7b4eada3b0c" />
