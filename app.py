@@ -17,7 +17,7 @@ until_date = tomorrow.strftime('%Y-%m-%d')
 # 기본 API 요청 매개변수
 params = {
     "argument": {
-        "query": "롯데이노베이트 OR 이노베이트 OR 롯데 AND AI",  # 초기 query (변경 가능)
+        "query": "인공지능 OR LLM OR AI",  # 초기 query (변경 가능)
         "published_at": {
             "from": from_date,
             "until": until_date
@@ -49,10 +49,10 @@ params = {
 headers = {'Content-type': 'application/json'}
 
 # Streamlit에서 사용자가 입력한 키워드 받아오기
-st.markdown(f"<h1 style='color: rgb(237, 27, 36); text-align: center;'>📰 오늘의 롯데 <span style='font-size: 14px; color: black;'>- {from_date}</span></h1>", unsafe_allow_html=True)
+st.markdown(f"<h1 style='color: rgb(237, 27, 36); text-align: center;'>📰 오늘의 인공지능 <span style='font-size: 14px; color: black;'>- {from_date}</span></h1>", unsafe_allow_html=True)
 
 # 기본 키워드를 입력하는 필드 (초기 query문에 포함)
-default_keywords = ["롯데이노베이트", "이노베이트", "롯데 AND AI"]
+default_keywords = ["인공지능", "LLM", "AI"]
 keywords_input = st.text_input("키워드를 입력하세요 (separate by 콤마, AND)", ", ".join(default_keywords))
 
 # 입력된 키워드에 따라 query 변경
@@ -60,7 +60,7 @@ if keywords_input:
     keywords = [keyword.strip() for keyword in keywords_input.split(",")]
     query = " OR ".join(keywords)
 else:
-    query = "롯데이노베이트 OR 이노베이트 OR 롯데 AND AI"
+    query = "인공지능 OR LLM OR AI"
 
 # API 요청 매개변수에 query 반영
 params["argument"]["query"] = query
@@ -80,7 +80,7 @@ if response.status_code == 200:
     
     # 검색된 뉴스 리스트 출력
     if documents:
-        st.write(f"📢 총 {len(documents)}건의 오늘의 롯데 소식을 알려드립니다! ")
+        st.write(f"📢 총 {len(documents)}건의 오늘의 인공지능 소식을 알려드립니다! ")
         
         for document in documents:
             title = document.get('title', 'No Title')
